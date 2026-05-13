@@ -1,0 +1,9 @@
+1. Create new project 
+2. give package name ( should be on top of all codes)
+3. create class , should match public void____
+4. Import all jars 
+5.configure java-jre+java compiler (1.8)
+6.Input foler->data.txt
+7.output name should be changed
+8.run->run as configuration ->project name, class ->arguments 
+9.run driver only 
