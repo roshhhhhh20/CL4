@@ -1,26 +1,32 @@
-package grader;
-import java.io.FileWriter;
-import java.util.Scanner;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.*;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
-public class CreateInputFile {
+public class GradeDriver {
+
     public static void main(String[] args) throws Exception {
 
-        try (Scanner sc = new Scanner(System.in)) {
-			FileWriter fw = new FileWriter(System.getProperty("user.dir") + "/students.txt");
-			System.out.println("Enter number of students:");
-			int n = sc.nextInt();
+        if (args.length != 2) {
+            System.out.println("Usage: GradeDriver <input path> <output path>");
+            System.exit(-1);
+        }
 
-			for (int i = 0; i < n; i++) {
-			    System.out.println("Enter name and marks:");
-			    String name = sc.next();
-			    int marks = sc.nextInt();
+        Configuration conf = new Configuration();
+        Job job = Job.getInstance(conf, "Student Grades");
 
-			    fw.write(name + " " + marks + "\n");
-			}
+        job.setJarByClass(GradeDriver.class);
+        job.setMapperClass(GradeMapper.class);
+        job.setReducerClass(GradeReducer.class);
 
-			fw.close();
-		}
-        System.out.println("Input file created successfully!");
-       
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(Text.class);
+
+        FileInputFormat.addInputPath(job, new Path(args[0]));
+        FileOutputFormat.setOutputPath(job, new Path(args[1]));
+
+        System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 }
